@@ -1,0 +1,15 @@
+{
+    "fixboxy": {
+        "steelPerBatch": 40,
+        "itemsPerBatch": 5,
+        "secondsPerBatch": 180,
+        "priceMin": 1900,
+        "priceMax": 2000
+    },
+    "weed": {
+        "secondsPerClean": 10,
+        "weedPerBag": 5,
+        "secondsPerPack": 10,
+        "pricePerBag": 2000
+    }
+}
