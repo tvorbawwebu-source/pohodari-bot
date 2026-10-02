@@ -1,6 +1,20 @@
 const { Client, GatewayIntentBits, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
+const express = require('express');
 const config = require('./config.json');
 
+// --- 1. WEBOVÝ SERVER (zabezpečí, že Render bota neuspí) ---
+const app = express();
+const port = process.env.PORT || 3000;
+
+app.get('/', (req, res) => {
+    res.send('Pohodari Bot beží na 100%!');
+});
+
+app.listen(port, () => {
+    console.log(`Web server počúva na porte ${port}`);
+});
+
+// --- 2. DISCORD BOT ---
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 
 client.on('ready', async () => {
@@ -49,7 +63,7 @@ client.on('interactionCreate', async interaction => {
             .setCustomId('amount_input')
             .setLabel(selectedValue === 'fixboxy' ? 'Počet kusov ocele:' : 'Počet neocistenej trávy:')
             .setStyle(TextInputStyle.Short)
-            .setPlaceholder('Napr. 567, 400...')
+            .setPlaceholder(selectedValue === 'fixboxy' ? 'Napr. 567, 400...' : 'Napr. 1648...')
             .setRequired(true);
 
         modal.addComponents(new ActionRowBuilder().addComponents(inputField));
@@ -80,7 +94,6 @@ client.on('interactionCreate', async interaction => {
         if (interaction.customId === 'modal_fixboxy') {
             const cfg = config.fixboxy;
 
-            // Výpočet celých dávok a zvyšku
             let batches = Math.floor(inputVal / cfg.steelPerBatch);
             let remainderSteel = inputVal % cfg.steelPerBatch;
             let totalFixboxes = batches * cfg.itemsPerBatch;
@@ -106,7 +119,6 @@ client.on('interactionCreate', async interaction => {
         } else if (interaction.customId === 'modal_weed') {
             const cfg = config.weed;
 
-            // Výpočet balíkov a zvyšku trávy
             let numBags = Math.floor(inputVal / cfg.weedPerBag);
             let remainderWeed = inputVal % cfg.weedPerBag;
             let cleanTime = inputVal * cfg.secondsPerClean; 
@@ -134,4 +146,5 @@ client.on('interactionCreate', async interaction => {
     }
 });
 
-client.login(process.env.MTU1NTI5NTkzOTQ3NDc1NTcxNA.GtBZSz.zyyJJK9YhA8Wd1UJ2agpXpooZ32yXXjxPsdc4o);
+// --- 3. PRIHLÁSENIE BOTA CEZ BEZPEČNÝ TOKEN ---
+client.login(process.env.DISCORD_TOKEN);
